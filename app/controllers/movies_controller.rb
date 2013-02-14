@@ -19,8 +19,16 @@ class MoviesController < ApplicationController
       @release_date_class = highlight_class
     end
     requiredRatings = @all_ratings
+    @selected_ratings = {}
     if params[:ratings] != nil
-      requiredRatings = params[:ratings].keys 
+      requiredRatings = params[:ratings].keys
+      requiredRatings.each do |rating|
+        @selected_ratings[rating] = true
+      end
+    else
+      @all_ratings.each do |rating|
+        @selected_ratings[rating] = true
+      end
     end
     @movies = Movie.where(:rating => requiredRatings).order(params[:sort_by])
   end
