@@ -20,15 +20,20 @@ class MoviesController < ApplicationController
     end
     requiredRatings = @all_ratings
     @selected_ratings = {}
-    if params[:ratings] != nil
-      requiredRatings = params[:ratings].keys
-      requiredRatings.each do |rating|
-        @selected_ratings[rating] = true
-      end
-    else
-      @all_ratings.each do |rating|
-        @selected_ratings[rating] = true
-      end
+    if !session.has_key?(:ratings) 
+      session[:ratings] = {}
+      @all_ratings.each { |rating| session[:ratings][("ratings_" + rating)] = 1}
+    end
+    if params[:ratings] == nil
+      return redirect_to movies_path(@movies, session[:ratings]) 
+    end
+    session[:ratings] = {}
+    requiredRatings = params[:ratings].keys
+    requiredRatings.each do |rating|
+      @selected_ratings[rating] = true
+    end
+    params[:ratings].each do |key, value|
+      session[:ratings][("ratings_" + key)] = value
     end
     @movies = Movie.where(:rating => requiredRatings).order(params[:sort_by])
   end
