@@ -22,10 +22,10 @@ class MoviesController < ApplicationController
     @selected_ratings = {}
     if !session.has_key?(:ratings) 
       session[:ratings] = {}
-      @all_ratings.each { |rating| session[:ratings][("ratings_" + rating)] = 1}
+      @all_ratings.each { |rating| session[:ratings][rating] = 1}
     end
-    if params[:ratings] == nil
-      return redirect_to movies_path(@movies, session[:ratings]) 
+    if params[:ratings] == nil 
+      return redirect_to movies_path(@movies, {:ratings => session[:ratings], :sort_by => session[:sort_by]}) 
     end
     session[:ratings] = {}
     requiredRatings = params[:ratings].keys
@@ -33,8 +33,9 @@ class MoviesController < ApplicationController
       @selected_ratings[rating] = true
     end
     params[:ratings].each do |key, value|
-      session[:ratings][("ratings_" + key)] = value
+      session[:ratings][key] = value
     end
+    session[:sort_by] = params[:sort_by]
     @movies = Movie.where(:rating => requiredRatings).order(params[:sort_by])
   end
 
