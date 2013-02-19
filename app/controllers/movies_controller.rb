@@ -36,10 +36,15 @@ class MoviesController < ApplicationController
       session[:ratings][key] = value
     end
     sort_by = ""
-    if !params.has_key?(:sort_by) and session.has_key?(:sort_by)
+    if (!params.has_key?(:sort_by)  and session.has_key?(:sort_by))
       if session[:sort_by] != ""
         redirect_to movies_path(@movies, params.merge(:sort_by => session[:sort_by]))
       end 
+    end
+    sort_options = ["title","rating","release_date"]
+    if params.has_key?(:sort_by) and !sort_options.include?(params[:sort_by])
+      params[:sort_by] = session[:sort_by]
+      redirect_to movies_path(@movies, params)
     end
     session[:sort_by] =  params[:sort_by]
     @movies = Movie.where(:rating => requiredRatings).order(params[:sort_by])
